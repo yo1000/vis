@@ -1,0 +1,69 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="_fragment :: header (title=${title})"></head>
+<link href="resources/c3/css/c3.min.css" th:href="@{/resources/c3/css/c3.min.css}" rel="stylesheet" type="text/css"/>
+<body>
+<nav th:replace="_fragment :: navigator"></nav>
+<div id="snowcover" class="container">
+    <div class="subject">
+        <h1 th:text="${name}">name</h1>
+    </div>
+    <div>
+        <div class="col-sm-12">
+            <div id="chart-raw"></div>
+            <div class="table-container">
+                <div id="table-raw"></div>
+            </div>
+        </div>
+    </div>
+</div><!-- /.container -->
+
+<footer th:replace="_fragment :: footer"></footer>
+<script src="resources/d3/js/d3.min.js" th:src="@{/resources/d3/js/d3.min.js}"></script>
+<script src="resources/c3/js/c3.min.js" th:src="@{/resources/c3/js/c3.min.js}"></script>
+<script src="resources/application/js/chart.js" th:src="@{/resources/application/js/chart.js}"></script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+
+$(document).on('ready', function() {
+    var url = /*[[ @{/api/v1/chart/} ]]*/ '#';
+    var key = /*[[ ${key != null ? key : ''} ]]*/ '';
+    var start = /*[[ ${start != null ? start : ''} ]]*/ '';
+    var end = /*[[ ${end != null ? end : ''} ]]*/ '';
+    var range = (start != null && start !== '') ? ('/' + start) : '';
+    range += + (end != null && end !== '') ? ('/' + end) : '';
+
+    $.ajax({
+        // endpoint
+        type: 'GET',
+        url: url + key + '/snowcover' + range,
+        // request
+        contentType: 'application/json',
+        processData: false,
+        // response
+        dataType: 'json'
+    }).done(function(data, textStatus, jqXHR) {
+        console.dir(data);
+
+        renderStackedBarChartFromArray('#chart-raw', data);
+        renderTableFromArray('#table-raw', data);
+    });
+
+//    $.ajax({
+//        // endpoint
+//        type: 'GET',
+//        url: url + key + '/rotate',
+//        // request
+//        contentType: 'application/json',
+//        processData: false,
+//        // response
+//        dataType: 'json'
+//    }).done(function(data, textStatus, jqXHR) {
+//        renderTableFromArray('#table-raw', data);
+//    });
+});
+
+/*]]>*/
+</script>
+</body>
+</html>

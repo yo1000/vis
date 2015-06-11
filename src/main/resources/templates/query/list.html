@@ -1,0 +1,180 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="_fragment :: header (title=${title})"></head>
+<body>
+<nav th:replace="_fragment :: navigator"></nav>
+<div class="container">
+    <!-- #modal-form -->
+    <div id="modal-form" class="modal fade" tabindex="-1"
+         role="dialog" aria-labelledby="modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="modal-title">Edit query</h4>
+                </div>
+                <div class="modal-body">
+                    <p id="modal-message"></p>
+                    <form action="query/update" method="POST" class="form-horizontal"
+                          th:action="@{/query/update}">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Key</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="key" class="form-control input-sm"
+                                       placeholder="author"/>
+                                <input type="hidden" name="id"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Name</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="name" class="form-control input-sm"
+                                       placeholder="author"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">SQL</label>
+                            <div class="col-sm-10">
+                                <textarea name="sql" class="form-control  input-sm" rows="8">sql</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">View</label>
+                            <div class="col-sm-10">
+                                <select name="view" class="form-control input-sm">
+                                    <option value="line">Line chart</option>
+                                    <option value="line-summary">Line summary chart</option>
+                                    <option value="snowcover">Snowcover chart</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Author</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="author" class="form-control input-sm"
+                                       placeholder="author"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button id="modal-ok" type="submit" class="btn btn-primary">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /#modal-form -->
+    <div class="subject">
+        <h1 th:text="${title}">title</h1>
+        <p class="lead"></p>
+    </div>
+    <div>
+        <table id="table" class="table table-hover table-condensed table-list">
+            <thead>
+            <tr class="active">
+                <th class="fott-col-key">Key</th>
+                <th class="fott-col-name">Name</th>
+                <th class="fott-col-view">View</th>
+                <th class="fott-col-author">Author</th>
+                <th class="fott-col-modified">Modified</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="query : ${queries}">
+                <td class="fott-key filter-value key" th:text="${query.key}">key</td>
+                <td class="fott-name filter-value name" th:text="${query.name}">name</td>
+                <td class="fott-view filter-value view" th:text="${query.view}">view</td>
+                <td class="fott-author filter-value author" th:text="${query.author}">author</td>
+                <td class="fott-modified filter-value modified" th:text="${#dates.format(query.modified, 'yyyy-MM-dd HH:mm')}">modified</td>
+                <td>
+                    <button type="button" class="btn btn-xs btn-default"
+                            data-toggle="modal" data-target="#modal-form"
+                            th:attr="data-id=${query.id}, data-key=${query.key}"
+                            >Edit</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div><!-- /.container -->
+
+<footer th:replace="_fragment :: footer"></footer>
+<script th:inline="javascript">
+/*<![CDATA[*/
+
+/**
+ * fott
+ */
+$('.fott-col-key').fott({fieldFilter: 'fott-key', inputClasses: 'form-control input-sm', placeholder: 'key'});
+$('.fott-col-name').fott({fieldFilter: 'fott-name', inputClasses: 'form-control input-sm', placeholder: 'name'});
+$('.fott-col-view').fott({fieldFilter: 'fott-view', inputClasses: 'form-control input-sm', placeholder: 'view'});
+$('.fott-col-author').fott({fieldFilter: 'fott-author', inputClasses: 'form-control input-sm', placeholder: 'author'});
+$('.fott-col-modified').fott({fieldFilter: 'fott-modified', inputClasses: 'form-control input-sm', placeholder: 'modified'});
+
+/**
+ * popover
+ */
+$('[data-toggle=popover]').popover({
+    content:function() {
+        return $(this).text();
+    }
+});
+
+/**
+ * show modal
+ */
+$('#modal-form').on('show.bs.modal', function (event) {
+    var $button = $(event.relatedTarget);
+    var url = /*[[ @{/api/v1/query/} ]]*/ '#';
+    var id = $button.data('id');
+
+    $.ajax({
+        // endpoint
+        type: 'GET',
+        url: (url + id),
+        // request
+        contentType: 'application/json',
+        processData: false,
+        // response
+        dataType: 'json'
+    }).done(function(data, textStatus, jqXHR) {
+        $('[name=id]').val(data.id);
+        $('[name=key]').val(data.key);
+        $('[name=name]').val(data.name);
+        $('[name=sql]').text(data.sql);
+        $('[name=view]').val(data.view);
+        $('[name=author]').val(data.author);
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        $('#modal-form .alert').remove();
+        $('#modal-form .modal-body').prepend(
+                '<div class="alert alert-warning alert-dismissible" role="alert">' +
+                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                '<span aria-hidden="true">&times;</span></button>' +
+                '<strong>Warning</strong> Cannot get the value. Please close the modal.</div>'
+        );
+    }).always(function() {
+        $('#modal-form button').button('reset');
+    });
+});
+
+$('#modal-ok').on('click', function() {
+    $('#modal-form form').submit();
+});
+
+$('.table-list td:not(:has(button))').on('click', function () {
+    var $row = $(this).closest('tr');
+    var $button = $row.find('button');
+
+    var url = /*[[ @{/chart/} ]]*/ '#';
+    var key = $button.data('key');
+
+    location.href = (url + key);
+});
+
+/*]]>*/
+</script>
+</body>
+</html>

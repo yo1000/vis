@@ -1,0 +1,185 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="_fragment :: header (title=${title})"></head>
+<body>
+<nav th:replace="_fragment :: navigator"></nav>
+<!-- #modal-form -->
+<div id="modal-form" class="modal fade" tabindex="-1" role="dialog"
+     aria-labelledby="modal-form-label" aria-hidden="true"
+     data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="#" method="POST" class="form-horizontal"
+                  th:action="@{/navigator}">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                            data-loading-text="&times;" autocomplete="off"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="modal-title">Run container</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Id</label>
+                        <div class="col-sm-8">
+                            <p class="form-control-static modal-form-id">id</p>
+                            <input type="hidden" name="id" class="modal-form-id"/>
+                            <input type="hidden" name="columnIndex" class="modal-form-columnIndex"/>
+                            <input type="hidden" name="rowIndex" class="modal-form-rowIndex"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Column Row</label>
+                        <div class="col-sm-8">
+                            <p class="form-control-static modal-form-colrow">colrow</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Screen name</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="name" placeholder="name"
+                                   class="modal-form-name form-control input-sm"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Url</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="url" placeholder="http://"
+                                   class="modal-form-url form-control input-sm"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-6">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="separator" value="1"/>&nbsp;Separator line
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"
+                            data-loading-text="Cancel" autocomplete="off">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="modal-form-btn-remove"
+                            data-loading-text="Please wait.." autocomplete="off">Remove</button>
+                    <button type="button" class="btn btn-primary" id="modal-form-btn-update"
+                            data-loading-text="Please wait.." autocomplete="off">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- /#modal-form -->
+<!-- .container -->
+<div id="navigator" class="container">
+    <div class="subject">
+        <h1>Navigator</h1>
+        <p class="lead"></p>
+    </div>
+    <div class="contents">
+        <ul class="list-inline">
+            <li>
+                <em><span class="label label-info">Headers</span></em>
+                <ul class="list-unstyled">
+                    <li><em><span class="label label-info">Subitems</span></em></li>
+                    <li><em>&nbsp;</em></li>
+                    <li><em>&nbsp;</em></li>
+                    <li><em>&nbsp;</em></li>
+                    <li><em>&nbsp;</em></li>
+                    <li><em>&nbsp;</em></li>
+                    <li><em>&nbsp;</em></li>
+                    <li><em>&nbsp;</em></li>
+                    <li><em>&nbsp;</em></li>
+                </ul>
+            </li>
+            <li th:each="navGroup, status : ${navGroups}">
+                <button class="btn" type="button"
+                        data-toggle="modal" data-target="#modal-form"
+                        th:classappend="${!#strings.isEmpty(navGroup.header.id)} ? 'btn-info' : 'btn-link'"
+                        th:text="${navGroup.header.separator} == '1' ? '(separator)' : ${navGroup.header.name}"
+                        th:attr="data-id=${navGroup.header.id},
+                                data-url=${navGroup.header.url},
+                                data-separator=${navGroup.header.separator},
+                                data-column-index=${navGroup.header.columnIndex},
+                                data-row-index=${navGroup.header.rowIndex}">name</button>
+                <ul class="list-unstyled" th:if="${not #lists.isEmpty(navGroup.subitems)}">
+                    <li th:each="nav, st : ${navGroup.subitems}">
+                        <button class="btn" type="button"
+                                data-toggle="modal" data-target="#modal-form"
+                                th:classappend="${!#strings.isEmpty(nav.id)} ? (${nav.separator} == '1'
+                                        ? 'btn-default btn-separator' : 'btn-default')
+                                        : 'btn-link'"
+                                th:text="${nav.separator} == '1' ? '(separator)' : ${nav.name}"
+                                th:attr="data-id=${nav.id},
+                                        data-url=${nav.url},
+                                        data-separator=${nav.separator},
+                                        data-column-index=${nav.columnIndex},
+                                        data-row-index=${nav.rowIndex}">name</button>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- /.container -->
+
+<footer th:replace="_fragment :: footer"></footer>
+<script th:inline="javascript">
+/*<![CDATA[*/
+$('#modal-form-btn-update').on('click', function(event) {
+    var $button = $(event.target);
+    var $form = $button.closest('form');
+
+    $form.attr('method', 'POST');
+    $form.submit();
+});
+$('#modal-form-btn-remove').on('click', function(event) {
+    var $button = $(event.target);
+    var $form = $button.closest('form');
+
+    $form.attr('method', 'DELETE');
+    $form.submit();
+});
+$('#modal-form').on('show.bs.modal', function (event) {
+    var $button = $(event.relatedTarget);
+
+    $('#modal-form [name=id]').val('');
+    $('#modal-form .modal-form-id').text('');
+    $('#modal-form .modal-form-colrow').text('');
+    $('#modal-form [name=name]').val('');
+    $('#modal-form [name=url]').val('');
+    $('#modal-form [name=columnIndex]').val('');
+    $('#modal-form [name=rowIndex]').val('');
+    $('#modal-form [name=separator]').prop('checked', false);
+
+    var id = $button.data('id');
+    var url = $button.data('url');
+    var col = $button.data('column-index');
+    var row = $button.data('row-index');
+    var name = $button.text();
+    var separator = $button.data('separator');
+
+    $('#modal-form [name=id]').val(id);
+    $('#modal-form .modal-form-colrow').text(
+            'C' + (col + 1) + ' ' +
+            (row === 0 ? 'Header' : 'R' + row));
+
+    if (separator === 1) {
+        $('#modal-form [name=separator]').prop('checked', true);
+        return;
+    }
+
+    $('#modal-form [name=url]').val(url);
+    $('#modal-form [name=columnIndex]').val(col);
+    $('#modal-form [name=rowIndex]').val(row);
+
+    if (id == null || id === '') {
+        return;
+    }
+
+    $('#modal-form .modal-form-id').text(id);
+    $('#modal-form [name=name]').val(name);
+});
+/*]]>*/
+</script>
+</body>
+</html>
