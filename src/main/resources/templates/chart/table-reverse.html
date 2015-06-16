@@ -4,13 +4,12 @@
 <body>
 <nav th:replace="_fragment :: navigator"></nav>
 <div th:replace="_fragment :: message"></div>
-<div id="snowcover" class="container">
+<div id="line" class="container">
     <div class="subject">
         <h1 th:text="${name}">name</h1>
     </div>
     <div>
         <div class="col-sm-12">
-            <div id="chart-raw"></div>
             <div class="table-container">
                 <div id="table-raw"></div>
             </div>
@@ -28,23 +27,18 @@
 $(document).on('ready', function() {
     var url = /*[[ @{/api/v1/chart/} ]]*/ '#';
     var key = /*[[ ${key != null ? key : ''} ]]*/ '';
-    var start = /*[[ ${start != null ? start : ''} ]]*/ '';
-    var end = /*[[ ${end != null ? end : ''} ]]*/ '';
-    var range = (start != null && start !== '') ? ('/' + start) : '';
-    range += + (end != null && end !== '') ? ('/' + end) : '';
 
     $.ajax({
         // endpoint
         type: 'GET',
-        url: url + key + '/snowcover' + range,
+        url: url + key,
         // request
         contentType: 'application/json',
         processData: false,
         // response
         dataType: 'json'
     }).done(function(data, textStatus, jqXHR) {
-        renderStackedBarChartFromArray('#chart-raw', data);
-        renderTableFromArray('#table-raw', data);
+        renderTable('#table-raw', data, true);
     });
 });
 

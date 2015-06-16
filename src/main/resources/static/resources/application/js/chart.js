@@ -86,7 +86,10 @@ var renderStackedBarChartFromArray = function(bindto, data) {
     });
 };
 
-var renderTable = function(bindto, data) {
+var renderTable = function(bindto, data, reverse) {
+    var length = arguments.length;
+    var rev = length < 3 ? true : reverse;
+
     if (data.length <= 0) {
         return;
     }
@@ -131,7 +134,12 @@ var renderTable = function(bindto, data) {
             $trData.append('<td>' + value + '</td>');
         }
 
-        $tableBody.append($trData);
+        if (rev) {
+            $tableBody.prepend($trData);
+        }
+        else {
+            $tableBody.append($trData);
+        }
     }
 
     $(bindto).append($table);

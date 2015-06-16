@@ -38,7 +38,7 @@ $(document).on('ready', function() {
         // response
         dataType: 'json'
     }).done(function(data, textStatus, jqXHR) {
-        renderTable('#table-raw', data);
+        renderTable('#table-raw', data, false);
     });
 });
 

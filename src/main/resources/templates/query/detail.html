@@ -41,6 +41,7 @@
                 <div class="col-sm-4">
                     <select class="form-control" disabled="disabled">
                         <option value="table" th:selected="${query.view == 'table'}">Table</option>
+                        <option value="table-reverse" th:selected="${query.view == 'table-reverse'}">Table reverse</option>
                         <option value="line" th:selected="${query.view == 'line'}">Line chart</option>
                         <option value="line-summary" th:selected="${query.view == 'line-summary'}">Line summary chart</option>
                         <option value="snowcover" th:selected="${query.view == 'snowcover'}">Snowcover chart</option>

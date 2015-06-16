@@ -37,10 +37,7 @@ $(document).on('ready', function() {
         var view = $chartArea.data('view');
         var format = '';
 
-        if (view === 'line-summary') {
-            format = '/summary';
-        }
-        else if (view === 'snowcover') {
+        if (view === 'snowcover') {
             format = '/snowcover';
         }
 
@@ -60,6 +57,12 @@ $(document).on('ready', function() {
             }
             else if (view === 'snowcover') {
                 renderStackedBarChartFromArray(chartSelector, data);
+            }
+            else if (view === 'table') {
+                renderTable(chartSelector, data, false);
+            }
+            else if (view === 'table-reverse') {
+                renderTable(chartSelector, data, true);
             }
         });
     }
