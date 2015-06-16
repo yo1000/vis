@@ -43,7 +43,8 @@ public class ChartService {
             return this.getCache().get(signature);
         }
 
-        List<Map<String, Object>> items = this.getItems(key);
+        Query query = this.getQueryRepository().findByKey(key);
+        List<Map<String, Object>> items = this.getChartRepository().getItems(query.getSql());
 
         for (int i = 1; i < items.size(); i++) {
             for (Map.Entry<String, Object> data : items.get(i).entrySet()) {
@@ -168,6 +169,13 @@ public class ChartService {
             }
 
             return true;
+        }
+
+        @Override
+        public String toString() {
+            return "QuerySignature{" +
+                    "args=" + Arrays.toString(args) +
+                    '}';
         }
 
         protected Object[] getArgs() {

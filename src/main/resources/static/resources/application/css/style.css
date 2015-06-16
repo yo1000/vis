@@ -1,5 +1,5 @@
 body {
-    padding-top: 50px;
+    padding-top: 80px;
 }
 
 .subject {
@@ -142,6 +142,13 @@ th input.form-control.input-sm {
     box-sizing: border-box;
 }
 
+#dashboard button {
+    width: 100%;
+    height: 4.0em;
+
+    margin-bottom: 2.0em;
+}
+
 .btn-info {
     background-color: #9aa;
     border-color: #899;
@@ -159,6 +166,16 @@ th input.form-control.input-sm {
 
 .btn-separator {
     border-style: dashed;
+}
+
+.rotate-message-contents {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+tspan {
+    font-size: x-small;
 }
 
 #line-summary #chart-raw,
@@ -197,4 +214,27 @@ th input.form-control.input-sm {
 #snowcover #table-raw th,
 #snowcover #table-raw td {
     font-size: small;
+}
+
+#message {
+    z-index:1;
+    margin-top:30px;
+
+    background-color: rgba(170, 187, 187, 0.5);
+}
+
+#message .container {
+    top: 30px;
+}
+
+#message .container,
+#message .container p {
+    position:relative;
+}
+
+#message .container p {
+    width:100%;
+    top: 9px;
+
+    white-space:nowrap;
 }

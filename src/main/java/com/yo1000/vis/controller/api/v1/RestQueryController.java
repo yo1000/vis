@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * Created by yoichi.kikuchi on 15/06/07.
  */
@@ -16,6 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class RestQueryController {
     @Autowired
     private QueryService queryService;
+
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    public List<Query> getItems() {
+        return this.getQueryService().getQueries();
+    }
 
     @RequestMapping(value = "{id:(?!^(?:register)$)^[a-zA-Z0-9]+$}", method = RequestMethod.GET)
     public Query getItem(@PathVariable String id) {

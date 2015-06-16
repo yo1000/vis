@@ -3,15 +3,69 @@
 <head th:replace="_fragment :: header (title=${title})"></head>
 <body>
 <nav th:replace="_fragment :: navigator"></nav>
+<div th:replace="_fragment :: message"></div>
 <div class="container">
     <div class="subject">
+        <h1 th:text="${title}">title</h1>
         <p class="lead"></p>
     </div>
-    <div>
-
+    <div class="contents">
+        <div class="col-sm-12">
+            <div class="col-sm-6" th:each="widgetQuery, status : ${widgetQueryMap}">
+                <h3 th:text="${widgetQuery.value.name}">name</h3>
+                <div th:id="'chart-' + ${status.count}"
+                     th:attr="data-key=${widgetQuery.value.key}, data-view=${widgetQuery.value.view}"></div>
+            </div>
+        </div>
     </div>
 </div><!-- /.container -->
 
 <footer th:replace="_fragment :: footer"></footer>
+<script src="resources/d3/js/d3.min.js" th:src="@{/resources/d3/js/d3.min.js}"></script>
+<script src="resources/c3/js/c3.min.js" th:src="@{/resources/c3/js/c3.min.js}"></script>
+<script src="resources/application/js/chart.js" th:src="@{/resources/application/js/chart.js}"></script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+
+$(document).on('ready', function() {
+    var url = /*[[ @{/api/v1/chart/} ]]*/ '#';
+
+    for (var i = 1; i <= 8; i++) {
+        var chartSelector = ('#chart-' + i);
+        var $chartArea = $(chartSelector);
+        var key = $chartArea.data('key');
+        var view = $chartArea.data('view');
+        var format = '';
+
+        if (view === 'line-summary') {
+            format = '/summary';
+        }
+        else if (view === 'snowcover') {
+            format = '/snowcover';
+        }
+
+        $.ajax({
+            async: false,
+            // endpoint
+            type: 'GET',
+            url: (url + key + format),
+            // request
+            contentType: 'application/json',
+            processData: false,
+            // response
+            dataType: 'json'
+        }).done(function(data, textStatus, jqXHR) {
+            if (view === 'line' || view === 'line-summary') {
+                renderLineChart(chartSelector, data);
+            }
+            else if (view === 'snowcover') {
+                renderStackedBarChartFromArray(chartSelector, data);
+            }
+        });
+    }
+});
+
+/*]]>*/
+</script>
 </body>
 </html>

@@ -1,9 +1,9 @@
 <!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="_fragment :: header (title=${title})"></head>
-<link href="resources/c3/css/c3.min.css" th:href="@{/resources/c3/css/c3.min.css}" rel="stylesheet" type="text/css"/>
 <body>
 <nav th:replace="_fragment :: navigator"></nav>
+<div th:replace="_fragment :: message"></div>
 <div id="line" class="container">
     <div class="subject">
         <h1 th:text="${name}">name</h1>

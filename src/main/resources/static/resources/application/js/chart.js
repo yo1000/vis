@@ -30,6 +30,7 @@ var renderLineChart = function(bindto, data) {
         },
         axis: {
             x: {
+                show: (data.length <= 24),
                 type: 'category',
                 tick: {
                     rotate: 90,

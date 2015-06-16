@@ -181,7 +181,6 @@ public class JdbcQueryRepository implements QueryRepository {
         );
     }
 
-
     @Override
     public int update(Query query) {
         return this.getJdbcTemplate().update("UPDATE QUERY SET " +
@@ -202,17 +201,6 @@ public class JdbcQueryRepository implements QueryRepository {
                 query.getId()
         );
     }
-        /*
-                "QRY_ID        VARCHAR(64)  NOT NULL, " +
-                "QRY_KEY       VARCHAR(64)  NOT NULL UNIQUE, " +
-                "QRY_NAME      VARCHAR(128) NOT NULL, " +
-                "QRY_SQL       CLOB         NOT NULL, " +
-                "QRY_VIEW      VARCHAR(64)  NOT NULL, " +
-                "QRY_AUTHOR    VARCHAR(64)  DEFAULT '', " +
-                "QRY_MODIFIED  INT,         NOT NULL," +
-
-     */
-
 
     protected JdbcTemplate getJdbcTemplate() {
         return jdbcTemplate;

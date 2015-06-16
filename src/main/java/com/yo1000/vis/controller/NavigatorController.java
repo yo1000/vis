@@ -17,19 +17,19 @@ public class NavigatorController {
     @Autowired
     private NavigatorService navigatorService;
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
-    public String getIndex(Model model) {
-        model.addAttribute("title", "Navigator");
+    @RequestMapping(value = "preference", method = RequestMethod.GET)
+    public String getPreference(Model model) {
+        model.addAttribute("title", "Navigator preference");
         model.addAttribute("navGroups", this.getNavigatorService().getNavigatorGroups());
 
-        return "navigator/index";
+        return "navigator/preference";
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public String postIndex(Navigator navigator) {
         this.getNavigatorService().setNavigator(navigator);
 
-        return "redirect:navigator";
+        return "redirect:/navigator/preference";
     }
 
     protected NavigatorService getNavigatorService() {

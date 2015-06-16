@@ -5,7 +5,8 @@
     <title th:text="${title} + ' - vis'">title</title>
     <link rel="icon" href="resources/application/img/favicon.ico" th:href="@{/resources/application/img/favicon.ico}"/>
     <link href="resources/bootstrap/css/bootstrap.min.css" th:href="@{/resources/bootstrap/css/bootstrap.min.css}" rel="stylesheet"/>
-    <link href="resources/application/css/style.css" th:href="@{/resources/application/css/style.css}" rel="stylesheet"/>
+    <link href="resources/c3/css/c3.min.css" th:href="@{/resources/c3/css/c3.min.css}" rel="stylesheet" type="text/css"/>
+    <link href="resources/application/css/style.css" th:href="@{/resources/application/css/style.css}" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <nav th:fragment="navigator" class="navbar navbar-inverse navbar-fixed-top">
@@ -27,27 +28,32 @@
                         <li><a href="#" th:href="@{/query}">Query list</a></li>
                         <li><a href="#" th:href="@{/query/register}">Query register</a></li>
                         <li class="divider"></li>
-                        <li><a href="#" th:href="@{/navigator}">Navigator</a></li>
+                        <li><a href="#" th:href="@{/navigator/preference}">Navigator</a></li>
+                        <li><a href="#" th:href="@{/dashboard/preference}">Dashboard</a></li>
                     </ul>
                 </li>
             </ul>
         </div><!--/.nav-collapse -->
     </div>
 </nav>
+<div th:fragment="message" id="message" class="navbar navbar-default navbar-fixed-top">
+    <div class="container"></div>
+</div>
 <footer th:fragment="footer">
 <script src="resources/jquery/js/jquery-1.11.2.min.js" th:src="@{/resources/jquery/js/jquery-1.11.2.min.js}"></script>
 <script src="resources/bootstrap/js/bootstrap.min.js" th:src="@{/resources/bootstrap/js/bootstrap.min.js}"></script>
 <script src="resources/bootstrap-hover-dropdown/js/bootstrap-hover-dropdown.min.js" th:src="@{/resources/bootstrap-hover-dropdown/js/bootstrap-hover-dropdown.min.js}"></script>
 <script src="resources/jquery-fott/js/jquery.fott.min.js" th:src="@{/resources/jquery-fott/js/jquery.fott.min.js}"></script>
+<script src="resources/application/js/jquery.rotateMessage.js" th:src="@{/resources/application/js/jquery.rotateMessage.js}"></script>
 <script th:inline="javascript">
 /*<![CDATA[*/
 $(document).on('ready', function() {
-    var url = /*[[ @{/api/v1/navigator} ]]*/ '#';
+    var navigatoerUrl = /*[[ @{/api/v1/navigator} ]]*/ '#';
 
     $.ajax({
         // endpoint
         type: 'GET',
-        url: url,
+        url: navigatoerUrl,
         // request
         contentType: 'application/json',
         processData: false,
@@ -109,6 +115,44 @@ $(document).on('ready', function() {
 
         $('.dropdown-toggle').dropdownHover();
         $navbar.show();
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        // nothing to do.
+    }).always(function() {
+        // nothing to do.
+    });
+
+    var messageUrl = /*[[ @{/api/v1/widget/messages} ]]*/ '#';
+
+    $.ajax({
+        // endpoint
+        type: 'GET',
+        url: messageUrl,
+        // request
+        contentType: 'application/json',
+        processData: false,
+        // response
+        dataType: 'json',
+        statusCode: {
+            400: function() {},
+            404: function() {},
+            500: function() {}
+        }
+    }).done(function(data, textStatus, jqXHR) {
+        $("#message .container").rotateMessage({
+            msgs: data,
+            dispTime: 4000,
+            switchTime: 'normal',
+            cssProps: { color: '#333' },
+            msgHandler: function(msg) {
+                if (typeof msg === 'string') {
+                    return msg;
+                }
+
+                for (var key in msg) {
+                    return msg[key];
+                }
+            }
+        });
     }).fail(function(jqXHR, textStatus, errorThrown) {
         // nothing to do.
     }).always(function() {
