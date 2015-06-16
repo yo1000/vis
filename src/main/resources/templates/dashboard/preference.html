@@ -1,0 +1,160 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="_fragment :: header (title=${title})"></head>
+<body>
+<nav th:replace="_fragment :: navigator"></nav>
+<div th:replace="_fragment :: message"></div>
+<!-- #modal-form -->
+<div id="modal-form" class="modal fade" tabindex="-1" role="dialog"
+     aria-labelledby="modal-form-label" aria-hidden="true"
+     data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="#" method="POST" class="form-horizontal"
+                  th:action="@{/dashboard}">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                            data-loading-text="&times;" autocomplete="off"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="modal-title" th:text="${title}">title</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Id</label>
+                        <div class="col-sm-8">
+                            <p class="form-control-static modal-form-id">id</p>
+                            <input type="hidden" name="id" class="modal-form-id"/>
+                            <input type="hidden" name="type" class="modal-form-type"/>
+                            <input type="hidden" name="position" class="modal-form-position"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Position</label>
+                        <div class="col-sm-8">
+                            <p class="form-control-static modal-form-position">position</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Query key</label>
+                        <div class="col-sm-8">
+                            <select name="queryId" class="form-control"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"
+                            data-loading-text="Cancel" autocomplete="off">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="modal-form-btn-remove"
+                            data-loading-text="Please wait.." autocomplete="off">Remove</button>
+                    <button type="button" class="btn btn-primary" id="modal-form-btn-update"
+                            data-loading-text="Please wait.." autocomplete="off">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- /#modal-form -->
+<!-- .container -->
+<div id="dashboard" class="container">
+    <div class="subject">
+        <h1 th:text="${title}">title</h1>
+        <p class="lead"></p>
+    </div>
+    <div class="contents">
+        <div class="col-sm-12">
+            <div class="col-sm-12">
+                <button class="btn" type="button"
+                        data-toggle="modal" data-target="#modal-form" data-type="message"
+                        th:classappend="${!#strings.isEmpty(messageEntry.key.id)} ? 'btn-default' : 'btn-link'"
+                        th:text="${!#strings.isEmpty(messageEntry.value.name)} ? ${messageEntry.value.name} : '(message widget is empty)'"
+                        th:attr="data-id=${messageEntry.key.id},
+                                data-position=${messageEntry.key.position},
+                                data-query-id=${messageEntry.key.queryId}">name</button>
+            </div>
+            <div class="col-sm-6" th:each="widget, status : ${widgetQueryMap}">
+                <button class="btn" type="button"
+                        data-toggle="modal" data-target="#modal-form" data-type="chart"
+                        th:classappend="${!#strings.isEmpty(widget.key.id)} ? 'btn-default' : 'btn-link'"
+                        th:text="${!#strings.isEmpty(widget.value.name)} ? ${widget.value.name} : '(chart widget is empty)'"
+                        th:attr="data-id=${widget.key.id},
+                                data-position=${widget.key.position},
+                                data-query-id=${widget.key.queryId}">name</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /.container -->
+
+<footer th:replace="_fragment :: footer"></footer>
+<script th:inline="javascript">
+/*<![CDATA[*/
+$('#modal-form-btn-update').on('click', function(event) {
+    var $button = $(event.target);
+    var $form = $button.closest('form');
+
+    $form.attr('method', 'POST');
+    $form.submit();
+});
+$('#modal-form-btn-remove').on('click', function(event) {
+    var $button = $(event.target);
+    var $form = $button.closest('form');
+
+    $form.attr('method', 'DELETE');
+    $form.submit();
+});
+$('#modal-form').on('show.bs.modal', function (event) {
+    var url = /*[[ @{/api/v1/query/} ]]*/ '#';
+    var $button = $(event.relatedTarget);
+
+    $('#modal-form [name=id]').val('');
+    $('#modal-form [name=queryId]').children().remove();
+
+    var id = $button.data('id');
+    var type = $button.data('type');
+    var position = $button.data('position');
+    var queryId = $button.data('queryId');
+
+    $('#modal-form [name=id]').val(id);
+    $('#modal-form [name=type]').val(type);
+    $('#modal-form [name=position]').val(position);
+
+    $('#modal-form .modal-form-id').text((id != null && id !== '') ? id : '*');
+    $('#modal-form .modal-form-position').text((position != null && position !== '') ? position : '');
+
+    $.ajax({
+        // endpoint
+        type: 'GET',
+        url: (url),
+        // request
+        contentType: 'application/json',
+        processData: false,
+        // response
+        dataType: 'json'
+    }).done(function(data, textStatus, jqXHR) {
+        var $select = $('#modal-form select[name=queryId]');
+
+        for (var i = 0; i < data.length; i++) {
+            var d = data[i];
+
+            var $option = $('<option></option>');
+            $option.val(d.id);
+            $option.text(d.key + ' (' + d.name + ')');
+            $option.prop('selected', (d.id === queryId));
+
+            $select.append($option);
+        }
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        $('#modal-form .alert').remove();
+        $('#modal-form .modal-body').prepend(
+                '<div class="alert alert-warning alert-dismissible" role="alert">' +
+                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+                '<span aria-hidden="true">&times;</span></button>' +
+                '<strong>Warning</strong> Cannot get the value. Please close the modal.</div>'
+        );
+    }).always(function() {
+        //
+    });
+});
+/*]]>*/
+</script>
+</body>
+</html>
