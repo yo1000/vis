@@ -220,12 +220,12 @@ tspan {
     font-size: small;
 }
 
-#dashboard .col-sm-6 {
+#dashboard .contents > div > div {
     margin-bottom: 2.0em;
 }
 
 #dashboard div[data-view=table] {
-    height: 300px;
+    height: 320px;
     overflow: auto;
 }
 
