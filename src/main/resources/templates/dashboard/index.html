@@ -11,7 +11,10 @@
     </div>
     <div class="contents">
         <div class="col-sm-12">
-            <div class="col-sm-6" th:each="widgetQuery, status : ${widgetQueryMap}">
+            <div class="col-sm-6"
+                 th:each="widgetQuery, status : ${widgetQueryMap}"
+                 th:class="'col-sm-' + ${widgetQuery.key.width * 3}"
+                 th:if="${!#strings.isEmpty(widgetQuery.key.id)}">
                 <h4 th:text="${widgetQuery.value.name}">name</h4>
                 <div th:id="'chart-' + ${status.count}"
                      th:attr="data-key=${widgetQuery.value.key}, data-view=${widgetQuery.value.view}"></div>

@@ -42,6 +42,13 @@ public class DashboardController {
         return "redirect:/dashboard/preference";
     }
 
+    @RequestMapping(value = "remove", method = RequestMethod.POST)
+    public String deleteIndex(Widget widget) {
+        this.getWidgetService().remove(widget.getId());
+
+        return "redirect:/dashboard/preference";
+    }
+
     protected WidgetService getWidgetService() {
         return widgetService;
     }

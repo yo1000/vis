@@ -26,13 +26,14 @@ public class JdbcWidgetRepository implements WidgetRepository {
     @Override
     public int insert(Widget widget) {
         return this.getJdbcTemplate().update("INSERT INTO WIDGET (" +
-                        "  WGT_ID,  WGT_TYPE,  WGT_POSITION,  QRY_ID " +
+                        "  WGT_ID,  WGT_TYPE,  WGT_POSITION,  WGT_WIDTH,  QRY_ID " +
                         ") VALUES ( " +
-                        "  ?, ?, ?, ? " +
+                        "  ?, ?, ?, ?, ? " +
                         ") ",
                 DigestUtils.md5DigestAsHex(UUID.randomUUID().toString().getBytes()),
                 widget.getType(),
                 widget.getPosition(),
+                widget.getWidth(),
                 widget.getQueryId()
         );
     }
@@ -42,13 +43,24 @@ public class JdbcWidgetRepository implements WidgetRepository {
         return this.getJdbcTemplate().update("UPDATE WIDGET SET " +
                         "  WGT_TYPE = ?, " +
                         "  WGT_POSITION = ?, " +
+                        "  WGT_WIDTH = ?, " +
                         "  QRY_ID  = ? " +
                         "WHERE " +
                         "  WGT_ID = ? ",
                 widget.getType(),
                 widget.getPosition(),
+                widget.getWidth(),
                 widget.getQueryId(),
                 widget.getId()
+        );
+    }
+
+    @Override
+    public int deleteById(String id) {
+        return this.getJdbcTemplate().update("DELETE FROM WIDGET " +
+                        "WHERE " +
+                        "  WGT_ID = ? ",
+                id
         );
     }
 
@@ -58,6 +70,7 @@ public class JdbcWidgetRepository implements WidgetRepository {
                         "  WGT_ID, " +
                         "  WGT_TYPE, " +
                         "  WGT_POSITION, " +
+                        "  WGT_WIDTH, " +
                         "  WIDGET.QRY_ID, " +
                         "  QRY_KEY, " +
                         "  QRY_NAME, " +
@@ -83,6 +96,7 @@ public class JdbcWidgetRepository implements WidgetRepository {
                                 resultSet.getString("WGT_ID"),
                                 resultSet.getString("WGT_TYPE"),
                                 resultSet.getInt("WGT_POSITION"),
+                                resultSet.getInt("WGT_WIDTH"),
                                 resultSet.getString("QRY_ID")
                         );
 
@@ -112,6 +126,7 @@ public class JdbcWidgetRepository implements WidgetRepository {
                         "  WGT_ID, " +
                         "  WGT_TYPE, " +
                         "  WGT_POSITION, " +
+                        "  WGT_WIDTH, " +
                         "  WIDGET.QRY_ID, " +
                         "  QRY_KEY, " +
                         "  QRY_NAME, " +
@@ -137,6 +152,7 @@ public class JdbcWidgetRepository implements WidgetRepository {
                                 resultSet.getString("WGT_ID"),
                                 resultSet.getString("WGT_TYPE"),
                                 resultSet.getInt("WGT_POSITION"),
+                                resultSet.getInt("WGT_WIDTH"),
                                 resultSet.getString("QRY_ID")
                         );
 
@@ -163,6 +179,7 @@ public class JdbcWidgetRepository implements WidgetRepository {
                         "  WGT_ID, " +
                         "  WGT_TYPE, " +
                         "  WGT_POSITION, " +
+                        "  WGT_WIDTH, " +
                         "  WIDGET.QRY_ID, " +
                         "  QRY_KEY, " +
                         "  QRY_NAME, " +
@@ -188,6 +205,7 @@ public class JdbcWidgetRepository implements WidgetRepository {
                                 resultSet.getString("WGT_ID"),
                                 resultSet.getString("WGT_TYPE"),
                                 resultSet.getInt("WGT_POSITION"),
+                                resultSet.getInt("WGT_WIDTH"),
                                 resultSet.getString("QRY_ID")
                         );
 
