@@ -224,7 +224,8 @@ tspan {
     margin-bottom: 2.0em;
 }
 
-#dashboard div[data-view=table] {
+#dashboard div[data-view=table],
+#dashboard div[data-view=table-reverse]{
     height: 320px;
     overflow: auto;
 }
