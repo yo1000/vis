@@ -7,14 +7,16 @@ public class Widget {
     private String id;
     private String type;
     private int position;
+    private int width;
     private String queryId;
 
     public Widget() {}
 
-    public Widget(String id, String type, int position, String queryId) {
+    public Widget(String id, String type, int position, int width, String queryId) {
         this.setId(id);
         this.setType(type);
         this.setPosition(position);
+        this.setWidth(width);
         this.setQueryId(queryId);
     }
 
@@ -40,6 +42,14 @@ public class Widget {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
     }
 
     public String getQueryId() {

@@ -12,6 +12,7 @@ import java.util.Map;
 public interface WidgetRepository {
     public int insert(Widget widget);
     public int updateById(Widget widget);
+    public int deleteById(String id);
     public Map<Widget, Query> findById(String id);
     public List<Map<Widget, Query>> findByTypeIsMessage();
     public List<Map<Widget, Query>> findByTypeIsChart();

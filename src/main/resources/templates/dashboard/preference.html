@@ -34,6 +34,12 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="col-sm-3 control-label">Width</label>
+                        <div class="col-sm-8">
+                            <select name="width" class="form-control"></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="col-sm-3 control-label">Query key</label>
                         <div class="col-sm-8">
                             <select name="queryId" class="form-control"></select>
@@ -65,18 +71,24 @@
                 <button class="btn" type="button"
                         data-toggle="modal" data-target="#modal-form" data-type="message"
                         th:classappend="${!#strings.isEmpty(messageEntry.key.id)} ? 'btn-default' : 'btn-link'"
-                        th:text="${!#strings.isEmpty(messageEntry.value.name)} ? ${messageEntry.value.name} : '(message widget is empty)'"
+                        th:text="${!#strings.isEmpty(messageEntry.value.name)}
+                                    ? ${messageEntry.value.name}
+                                    : '(message widget is empty)'"
                         th:attr="data-id=${messageEntry.key.id},
                                 data-position=${messageEntry.key.position},
+                                data-width=0,
                                 data-query-id=${messageEntry.key.queryId}">name</button>
             </div>
-            <div class="col-sm-6" th:each="widget, status : ${widgetQueryMap}">
+            <div class="col-sm-3" th:each="widget, status : ${widgetQueryMap}">
                 <button class="btn" type="button"
                         data-toggle="modal" data-target="#modal-form" data-type="chart"
                         th:classappend="${!#strings.isEmpty(widget.key.id)} ? 'btn-default' : 'btn-link'"
-                        th:text="${!#strings.isEmpty(widget.value.name)} ? ${widget.value.name} : '(chart widget is empty)'"
+                        th:text="${!#strings.isEmpty(widget.value.name)}
+                                    ? (${widget.value.name} + ' [' + ${widget.key.width} + '/4]')
+                                    : '(chart widget is empty)'"
                         th:attr="data-id=${widget.key.id},
                                 data-position=${widget.key.position},
+                                data-width=${widget.key.width},
                                 data-query-id=${widget.key.queryId}">name</button>
             </div>
         </div>
@@ -98,7 +110,9 @@ $('#modal-form-btn-remove').on('click', function(event) {
     var $button = $(event.target);
     var $form = $button.closest('form');
 
-    $form.attr('method', 'DELETE');
+    var action = $form.attr('action');
+    $form.attr('action', action + '/remove');
+    $form.attr('method', 'POST');
     $form.submit();
 });
 $('#modal-form').on('show.bs.modal', function (event) {
@@ -106,11 +120,13 @@ $('#modal-form').on('show.bs.modal', function (event) {
     var $button = $(event.relatedTarget);
 
     $('#modal-form [name=id]').val('');
-    $('#modal-form [name=queryId]').children().remove();
+    $('#modal-form select[name=queryId]').children().remove();
+    $('#modal-form select[name=width]').children().remove();
 
     var id = $button.data('id');
     var type = $button.data('type');
     var position = $button.data('position');
+    var width = $button.data('width');
     var queryId = $button.data('queryId');
 
     $('#modal-form [name=id]').val(id);
@@ -119,6 +135,17 @@ $('#modal-form').on('show.bs.modal', function (event) {
 
     $('#modal-form .modal-form-id').text((id != null && id !== '') ? id : '*');
     $('#modal-form .modal-form-position').text((position != null && position !== '') ? position : '');
+
+    var $selectWidth = $('#modal-form select[name=width]');
+
+    for (var i = 1; i <= 4; i++) {
+        var $optionWidth = $('<option></option>');
+        $optionWidth.val(i);
+        $optionWidth.text(i + '/4');
+        $optionWidth.prop('selected', (i === width));
+
+        $selectWidth.append($optionWidth);
+    }
 
     $.ajax({
         // endpoint
@@ -130,17 +157,17 @@ $('#modal-form').on('show.bs.modal', function (event) {
         // response
         dataType: 'json'
     }).done(function(data, textStatus, jqXHR) {
-        var $select = $('#modal-form select[name=queryId]');
+        var $selectQueryId = $('#modal-form select[name=queryId]');
 
         for (var i = 0; i < data.length; i++) {
             var d = data[i];
 
-            var $option = $('<option></option>');
-            $option.val(d.id);
-            $option.text(d.key + ' (' + d.name + ')');
-            $option.prop('selected', (d.id === queryId));
+            var $optionQueryId = $('<option></option>');
+            $optionQueryId.val(d.id);
+            $optionQueryId.text(d.key + ' (' + d.name + ')');
+            $optionQueryId.prop('selected', (d.id === queryId));
 
-            $select.append($option);
+            $selectQueryId.append($optionQueryId);
         }
     }).fail(function(jqXHR, textStatus, errorThrown) {
         $('#modal-form .alert').remove();

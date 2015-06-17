@@ -26,7 +26,7 @@ public class WidgetService {
         if (results == null || results.isEmpty()) {
             return new LinkedHashMap<Widget, Query>() {
                 {
-                    this.put(new Widget("", "chart", 0, ""), new Query());
+                    this.put(new Widget("", "message", 0, 0, ""), new Query());
                 }
             };
         }
@@ -36,13 +36,13 @@ public class WidgetService {
 
     public Map<Widget, Query> getChartWidgets() {
         List<Map<Widget, Query>> results = this.getWidgetRepository().findByTypeIsChart();
-        final int itemSize = 8;
+        final int itemSize = 16;
 
         if (results == null || results.isEmpty()) {
             Map<Widget, Query> items = new LinkedHashMap<Widget, Query>();
 
             for (int i = 0; i < itemSize; i++) {
-                items.put(new Widget("", "chart", i + 1, ""), new Query());
+                items.put(new Widget("", "chart", i + 1, 2, ""), new Query());
             }
             return items;
         }
@@ -53,14 +53,14 @@ public class WidgetService {
             Map.Entry<Widget, Query> result = results.get(i).entrySet().iterator().next();
 
             for (int j = items.size(); j < result.getKey().getPosition() - 1; j++) {
-                items.put(new Widget("", "chart", j + 1, ""), new Query());
+                items.put(new Widget("", "chart", j + 1, 2, ""), new Query());
             }
 
             items.put(result.getKey(), result.getValue());
         }
 
         for (int i = items.size(); i < itemSize; i++) {
-            items.put(new Widget("", "chart", i + 1, ""), new Query());
+            items.put(new Widget("", "chart", i + 1, 2, ""), new Query());
         }
 
         return items;
@@ -73,6 +73,14 @@ public class WidgetService {
         }
 
         this.getWidgetRepository().updateById(widget);
+    }
+
+    public void remove(String id) {
+        if (id == null || id.isEmpty()) {
+            return;
+        }
+
+        this.getWidgetRepository().deleteById(id);
     }
 
     protected WidgetRepository getWidgetRepository() {
