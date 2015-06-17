@@ -216,6 +216,15 @@ tspan {
     font-size: small;
 }
 
+#dashboard .col-sm-6 {
+    margin-bottom: 2.0em;
+}
+
+#dashboard div[data-view=table] {
+    height: 300px;
+    overflow: auto;
+}
+
 #message {
     z-index:1;
     margin-top:30px;
