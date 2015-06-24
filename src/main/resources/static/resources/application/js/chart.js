@@ -122,13 +122,12 @@ var renderTable = function(bindto, data, reverse) {
         for (var index in cols) {
             var value = d[cols[index]];
 
-            if (index > 0) {
-                if (String(value).match(/^-?[0-9]+\.[0-9]+$/)) {
-                    value = Number(value).toFixed(2);
-                }
-                else if (String(value).match(/^-?[0-9]+$/)) {
-                    value = String(value).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
-                }
+            if (String(value).match(/^-?[0-9]+\.[0-9]+$/)) {
+                value = Number(value).toFixed(2);
+            }
+
+            if (String(value).match(/^-?[0-9]+(\.[0-9]+)?$/)) {
+                value = String(value).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
             }
 
             $trData.append('<td>' + value + '</td>');
