@@ -41,7 +41,9 @@ public class RestChartController {
         calendar.setTime(today);
         calendar.add(Calendar.YEAR, -1);
 
-        return this.getChartService().getItemsForSnowCover(key, calendar.getTime(), today);
+        return this.getChartService().getItemsForSnowCover(key,
+                this.normalizeStartDate(calendar.getTime()),
+                this.normalizeEndDate(today));
     }
 
     @RequestMapping("{key:^[0-9a-zA-Z_\\-]+$}/snowcover/{start}")
@@ -49,13 +51,17 @@ public class RestChartController {
             @PathVariable String key, @PathVariable Date start) {
         Date today = new Date(System.currentTimeMillis());
 
-        return this.getChartService().getItemsForSnowCover(key, start, today);
+        return this.getChartService().getItemsForSnowCover(key,
+                this.normalizeStartDate(start),
+                this.normalizeEndDate(today));
     }
 
     @RequestMapping("{key:^[0-9a-zA-Z_\\-]+$}/snowcover/{start}/{end}")
     public List<List<Object>> getItemsForSnowCoverByDateRange(
             @PathVariable String key, @PathVariable Date start, @PathVariable Date end) {
-        return this.getChartService().getItemsForSnowCover(key, start, end);
+        return this.getChartService().getItemsForSnowCover(key,
+                this.normalizeStartDate(start),
+                this.normalizeEndDate(end));
     }
 
     @InitBinder
@@ -63,6 +69,28 @@ public class RestChartController {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         dateFormat.setLenient(false);
         binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, false));
+    }
+
+    protected Date normalizeStartDate(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
+        calendar.set(Calendar.HOUR, calendar.getActualMinimum(Calendar.HOUR));
+        calendar.set(Calendar.MINUTE, calendar.getActualMinimum(Calendar.MINUTE));
+        calendar.set(Calendar.SECOND, calendar.getActualMinimum(Calendar.SECOND));
+        calendar.set(Calendar.MILLISECOND, calendar.getActualMinimum(Calendar.MILLISECOND));
+        return calendar.getTime();
+    }
+
+    protected Date normalizeEndDate(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        calendar.set(Calendar.HOUR, calendar.getActualMaximum(Calendar.HOUR));
+        calendar.set(Calendar.MINUTE, calendar.getActualMaximum(Calendar.MINUTE));
+        calendar.set(Calendar.SECOND, calendar.getActualMaximum(Calendar.SECOND));
+        calendar.set(Calendar.MILLISECOND, calendar.getActualMaximum(Calendar.MILLISECOND));
+        return calendar.getTime();
     }
 
     protected ChartService getChartService() {

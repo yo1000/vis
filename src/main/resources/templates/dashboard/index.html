@@ -36,6 +36,11 @@ $(document).on('ready', function() {
     for (var i = 1; i <= 16; i++) {
         var chartSelector = ('#chart-' + i);
         var $chartArea = $(chartSelector);
+
+        if ($chartArea.length <= 0) {
+            continue;
+        }
+
         var key = $chartArea.data('key');
         var view = $chartArea.data('view');
         var format = '';
