@@ -71,7 +71,7 @@ public @interface Cache {
     }
 
     public static class Store {
-        private Map<Signature, Object> cache = new ConcurrentHashMap<Signature, Object>();
+        private Map<Signature, Object> store = new ConcurrentHashMap<Signature, Object>();
         private long interval = 1000L * 60L * 60L * 8L;
         private long expires = System.currentTimeMillis() + this.getInterval();
 
@@ -80,7 +80,7 @@ public @interface Cache {
         }
 
         public <T> T set(Signature signature, T item) {
-            this.getCache().put(signature, item);
+            this.getStore().put(signature, item);
             this.updateExpires();
 
             return item;
@@ -91,22 +91,26 @@ public @interface Cache {
                 return null;
             }
 
-            if (!this.getCache().containsKey(signature)) {
+            if (!this.getStore().containsKey(signature)) {
                 return null;
             }
 
-            return (T) this.getCache().get(signature);
+            return (T) this.getStore().get(signature);
+        }
+
+        public <T> T remove(Signature signature) {
+            return (T) this.getStore().remove(signature);
         }
 
         protected void updateExpires() {
             if (System.currentTimeMillis() > this.getExpires()) {
-                this.getCache().clear();
+                this.getStore().clear();
                 this.setExpires(System.currentTimeMillis() + this.getInterval());
             }
         }
 
-        protected Map<Signature, Object> getCache() {
-            return cache;
+        protected Map<Signature, Object> getStore() {
+            return store;
         }
 
         protected long getInterval() {

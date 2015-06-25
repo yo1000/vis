@@ -4,6 +4,10 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by yoichi.kikuchi on 2015/06/25.
@@ -23,6 +27,15 @@ public class CacheAdvisor {
         System.arraycopy(args, 0, signatureSources, 1, args.length);
 
         Cache.Signature signature = new Cache.Signature(signatureSources);
+
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
+                .currentRequestAttributes()).getRequest();
+
+        String cacheParameter = request.getParameter("cache");
+
+        if (cacheParameter != null && cacheParameter.equals("clear")) {
+            this.getCacheStore().remove(signature);
+        }
 
         if (this.getCacheStore().exists(signature)) {
             return this.getCacheStore().get(signature);
