@@ -61,7 +61,8 @@ public class JdbcRequestHistoryRepository implements RequestHistoryRepository {
                     public Integer mapRow(ResultSet resultSet, int i) throws SQLException {
                         return resultSet.getInt("HST_CNT");
                     }
-                }
+                },
+                url
         ) > 0;
     }
 
