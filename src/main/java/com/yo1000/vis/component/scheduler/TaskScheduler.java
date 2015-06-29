@@ -26,7 +26,7 @@ public class TaskScheduler {
     public void renewCache() {
         for (RequestHistory history : this.getRequestHistoryService().getHistories()) {
             try {
-                this.getRestTemplate().getForObject(history.getUrl(), Void.class);
+                this.getRestTemplate().getForObject(history.getUrl(), String.class);
             }
             catch (Exception e) {
                 LOGGER.warn(e.getMessage(), e);
