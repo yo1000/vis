@@ -1,5 +1,6 @@
 package com.yo1000.vis.component.aop;
 
+import com.yo1000.vis.model.service.RequestHistoryService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,11 +18,14 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class CacheAdvisor {
     @Autowired
+    private RequestHistoryService requestHistoryService;
+
+    @Autowired
     private Cache.Store cacheStore;
 
     @Around("execution(* com.yo1000.vis.controller.api.v1.*.*(..)) " +
-            "&& @annotation(Cache)")
-    public Object aroundRestController(ProceedingJoinPoint joinPoint) throws Throwable {
+            "&& @annotation(org.springframework.web.bind.annotation.RequestMapping)")
+    protected Object aroundRestController(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] args = joinPoint.getArgs();
         Object[] signatureSources = new Object[args.length + 1];
 
@@ -33,8 +37,9 @@ public class CacheAdvisor {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
                 .currentRequestAttributes()).getRequest();
 
-        String cacheParameter = request.getParameter("cache");
+        this.getRequestHistoryService().setHistory(request.getRequestURL().toString());
 
+        String cacheParameter = request.getParameter("cache");
         if (cacheParameter != null && cacheParameter.equals("clear")) {
             this.getCacheStore().remove(signature);
         }
@@ -44,7 +49,7 @@ public class CacheAdvisor {
 
     @Around("execution(* com.yo1000.vis.model.service.ChartService.*(..)) " +
             "&& @annotation(Cache)")
-    public Object aroundChartService(ProceedingJoinPoint joinPoint) throws Throwable {
+    protected Object aroundChartService(ProceedingJoinPoint joinPoint) throws Throwable {
         Object[] args = joinPoint.getArgs();
         Object[] signatureSources = new Object[args.length + 1];
 
@@ -61,6 +66,10 @@ public class CacheAdvisor {
         this.getCacheStore().set(signature, returnValue);
 
         return returnValue;
+    }
+
+    protected RequestHistoryService getRequestHistoryService() {
+        return requestHistoryService;
     }
 
     protected Cache.Store getCacheStore() {

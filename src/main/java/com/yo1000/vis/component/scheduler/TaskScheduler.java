@@ -1,13 +1,13 @@
 package com.yo1000.vis.component.scheduler;
 
-import com.yo1000.vis.model.data.Query;
-import com.yo1000.vis.model.service.ChartService;
-import com.yo1000.vis.model.service.QueryService;
+import com.yo1000.vis.model.data.RequestHistory;
+import com.yo1000.vis.model.service.RequestHistoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Created by yoichi.kikuchi on 2015/06/26.
@@ -17,16 +17,16 @@ public class TaskScheduler {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskScheduler.class);
 
     @Autowired
-    private ChartService chartService;
+    private RequestHistoryService requestHistoryService;
 
     @Autowired
-    private QueryService queryService;
+    private RestTemplate restTemplate;
 
     @Scheduled(cron = "0 */20 8-23 * * 1-5")
     public void renewCache() {
-        for (Query query : this.getQueryService().getQueries()) {
+        for (RequestHistory history : this.getRequestHistoryService().getHistories()) {
             try {
-                this.runQuery(query);
+                this.getRestTemplate().getForObject(history.getUrl(), Void.class);
             }
             catch (Exception e) {
                 LOGGER.warn(e.getMessage(), e);
@@ -34,25 +34,11 @@ public class TaskScheduler {
         }
     }
 
-    protected void runQuery(Query query) {
-        if (query == null || query.getView() == null || query.getKey() == null) {
-            return;
-        }
-
-        if (query.getView().equals("snowcover")) {
-            this.getChartService().getItemsForSnowCover(query.getKey(), null, null);
-            return;
-        }
-
-        this.getChartService().getItems(query.getKey());
-        this.getChartService().getItemsForSummary(query.getKey());
+    protected RequestHistoryService getRequestHistoryService() {
+        return requestHistoryService;
     }
 
-    protected ChartService getChartService() {
-        return chartService;
-    }
-
-    protected QueryService getQueryService() {
-        return queryService;
+    protected RestTemplate getRestTemplate() {
+        return restTemplate;
     }
 }
