@@ -35,6 +35,10 @@ public class TaskScheduler {
     }
 
     protected void runQuery(Query query) {
+        if (query == null || query.getView() == null || query.getKey() == null) {
+            return;
+        }
+
         if (query.getView().equals("snowcover")) {
             this.getChartService().getItemsForSnowCover(query.getKey(), null, null);
             return;
