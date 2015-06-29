@@ -1,6 +1,6 @@
 package com.yo1000.vis.model.service;
 
-import com.yo1000.vis.aop.Cache;
+import com.yo1000.vis.component.aop.Cache;
 import com.yo1000.vis.model.data.Query;
 import com.yo1000.vis.model.repository.chart.ChartRepository;
 import com.yo1000.vis.model.repository.system.QueryRepository;

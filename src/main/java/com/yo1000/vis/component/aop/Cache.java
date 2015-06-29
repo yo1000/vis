@@ -1,4 +1,4 @@
-package com.yo1000.vis.aop;
+package com.yo1000.vis.component.aop;
 
 import java.util.Arrays;
 import java.util.Map;

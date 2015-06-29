@@ -1,5 +1,6 @@
 package com.yo1000.vis;
 
+import com.yo1000.vis.component.aop.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
@@ -9,17 +10,24 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Created by yoichi.kikuchi on 15/06/02.
  */
 @SpringBootApplication
+@EnableScheduling
 public class ApplicationContext {
     public static final String PROPS_DATA_SYSTEM_JDBC = "vis.data.system.jdbc";
     public static final String PROPS_DATA_CHART_JDBC = "vis.data.chart.jdbc";
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(ApplicationContext.class, args);
+    }
+
+    @Bean
+    public Cache.Store cacheStore() {
+        return new Cache.Store();
     }
 
     @Bean
