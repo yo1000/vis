@@ -50,8 +50,8 @@ public class ApplicationContext {
     }
 
     @Bean
-    public Cache.Store cacheStore() {
-        return new Cache.Store();
+    public Cache.Store<String> cacheStore() {
+        return new Cache.Store<String>();
     }
 
     @Bean

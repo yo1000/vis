@@ -21,49 +21,28 @@ public class CacheAdvisor {
     private RequestHistoryService requestHistoryService;
 
     @Autowired
-    private Cache.Store cacheStore;
+    private Cache.Store<String> cacheStore;
 
     @Around("execution(* com.yo1000.vis.controller.api.v1.*.*(..)) " +
             "&& @annotation(org.springframework.web.bind.annotation.RequestMapping)")
     protected Object aroundRestController(ProceedingJoinPoint joinPoint) throws Throwable {
-        Object[] args = joinPoint.getArgs();
-        Object[] signatureSources = new Object[args.length + 1];
-
-        signatureSources[0] = joinPoint.getSignature().toLongString();
-        System.arraycopy(args, 0, signatureSources, 1, args.length);
-
-        Cache.Signature signature = new Cache.Signature(signatureSources);
-
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
                 .currentRequestAttributes()).getRequest();
+        String url = request.getRequestURL().toString();
 
-        this.getRequestHistoryService().setHistory(request.getRequestURL().toString());
+        this.getRequestHistoryService().setHistory(url);
 
         String cacheParameter = request.getParameter("cache");
         if (cacheParameter != null && cacheParameter.equals("clear")) {
-            this.getCacheStore().remove(signature);
+            this.getCacheStore().remove(url);
         }
 
-        return joinPoint.proceed();
-    }
-
-    @Around("execution(* com.yo1000.vis.model.service.ChartService.*(..)) " +
-            "&& @annotation(Cache)")
-    protected Object aroundChartService(ProceedingJoinPoint joinPoint) throws Throwable {
-        Object[] args = joinPoint.getArgs();
-        Object[] signatureSources = new Object[args.length + 1];
-
-        signatureSources[0] = joinPoint.getSignature().toLongString();
-        System.arraycopy(args, 0, signatureSources, 1, args.length);
-
-        Cache.Signature signature = new Cache.Signature(signatureSources);
-
-        if (this.getCacheStore().exists(signature)) {
-            return this.getCacheStore().get(signature);
+        if (this.getCacheStore().exists(url)) {
+            return this.getCacheStore().get(url);
         }
 
         Object returnValue = joinPoint.proceed();
-        this.getCacheStore().set(signature, returnValue);
+        this.getCacheStore().set(url, returnValue);
 
         return returnValue;
     }
