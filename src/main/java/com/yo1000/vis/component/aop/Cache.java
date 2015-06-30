@@ -1,4 +1,4 @@
-package com.yo1000.vis.aop;
+package com.yo1000.vis.component.aop;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -70,36 +70,36 @@ public @interface Cache {
         }
     }
 
-    public static class Store {
-        private Map<Signature, Object> store = new ConcurrentHashMap<Signature, Object>();
+    public static class Store<K> {
+        private Map<K, Object> store = new ConcurrentHashMap<K, Object>();
         private long interval = 1000L * 60L * 60L * 8L;
         private long expires = System.currentTimeMillis() + this.getInterval();
 
-        public boolean exists(Signature signature) {
-            return this.get(signature) != null;
+        public boolean exists(K key) {
+            return this.get(key) != null;
         }
 
-        public <T> T set(Signature signature, T item) {
-            this.getStore().put(signature, item);
+        public <T> T set(K key, T item) {
+            this.getStore().put(key, item);
             this.updateExpires();
 
             return item;
         }
 
-        public <T> T get(Signature signature) {
+        public <T> T get(K key) {
             if (System.currentTimeMillis() > this.getExpires()) {
                 return null;
             }
 
-            if (!this.getStore().containsKey(signature)) {
+            if (!this.getStore().containsKey(key)) {
                 return null;
             }
 
-            return (T) this.getStore().get(signature);
+            return (T) this.getStore().get(key);
         }
 
-        public <T> T remove(Signature signature) {
-            return (T) this.getStore().remove(signature);
+        public <T> T remove(K key) {
+            return (T) this.getStore().remove(key);
         }
 
         protected void updateExpires() {
@@ -109,7 +109,7 @@ public @interface Cache {
             }
         }
 
-        protected Map<Signature, Object> getStore() {
+        protected Map<K, Object> getStore() {
             return store;
         }
 
